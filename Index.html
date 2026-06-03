@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPP Theme Builder</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; max-width: 500px; margin: 0 auto; }
+        h1 { font-size: 24px; text-align: center; color: #ff4757; }
+        .card { background: #2f3542; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #a4b0be; }
+        input[type="text"] { width: 100%; padding: 10px; background: #57606f; border: none; border-radius: 6px; color: #fff; box-sizing: border-box; }
+        input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 6px; cursor: pointer; background: none; }
+        button { width: 100%; padding: 12px; background: #2ed573; border: none; border-radius: 6px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #26af5f; }
+        #result-box { margin-top: 20px; display: none; }
+        .link-out { background: #747d8c; padding: 10px; border-radius: 6px; word-break: break-all; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<script>
+    // ЛОГИКА ДЛЯ HAPP: Если в ссылке есть параметры темы, отдаем чистый текст для приложения
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('theme') || urlParams.has('icon')) {
+        const title = urlParams.get('title') || "Кастомная тема";
+        const bg = urlParams.get('theme') || "000000";
+        const icon = urlParams.get('icon') || "FFFFFF";
+        
+        let configText = `#profile-title: ${title}\n`;
+        configText += `#theme-color: #${bg.replace('#','')}\n`;
+        configText += `#powerIcon-color: #${icon.replace('#','')}\n`;
+        
+        // Очищаем страницу и выводим ТОЛЬКО текст для импорта в HAPP
+        document.open();
+        document.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + configText + '</pre>');
+        document.close();
+    }
+</script>
+
+<!-- ВИЗУАЛЬНЫЙ КОНСТРУКТОР ДЛЯ ВАС В БРАУЗЕРЕ -->
+<h1>HAPP Theme Builder</h1>
+<div class="card">
+    <div class="group">
+        <label>Название темы в приложении</label>
+        <input type="text" id="themeTitle" value="Моя Кастомная Тема">
+    </div>
+    <div class="group">
+        <label>Цвет фона интерфейса</label>
+        <input type="color" id="bgColor" value="#2F3136">
+    </div>
+    <div class="group">
+        <label>Цвет кнопки включения</label>
+        <input type="color" id="iconColor" value="#E2E8F0">
+    </div>
+    <button onclick="generateThemeLink()">Сгенерировать ссылку</button>
+
+    <div id="result-box">
+        <label>Ваша готовая ссылка для HAPP:</label>
+        <div class="link-out" id="linkOutput"></div>
+        <button style="background: #1e90ff;" onclick="copyLink()">Скопировать ссылку</button>
+    </div>
+</div>
+
+<script>
+    function generateThemeLink() {
+        const title = encodeURIComponent(document.getElementById('themeTitle').value);
+        const bg = document.getElementById('bgColor').value.replace('#', '');
+        const icon = document.getElementById('iconColor').value.replace('#', '');
+        
+        // Автоматически подхватываем текущий домен вашего GitHub Pages
+        const baseUrl = window.location.href.split('?')[0];
+        const finalUrl = `${baseUrl}?title=${title}&theme=${bg}&icon=${icon}`;
+        
+        document.getElementById('linkOutput').innerText = finalUrl;
+        document.getElementById('result-box').style.display = 'block';
+    }
+
+    function copyLink() {
+        const text = document.getElementById('linkOutput').innerText;
+        navigator.clipboard.writeText(text);
+        alert('Ссылка скопирована! Вставьте её в HAPP через «+»');
+    }
+</script>
+</body>
+</html>
